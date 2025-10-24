@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TradingView Search Enabled (No Header, Tabs Reordered)</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: #0f172a; min-height: 100vh; padding: 40px 20px; color:#e5e7eb;}
+    .container { max-width: 1200px; margin: 0 auto; }
+    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center;}
+    .tab-button { background: #1f2937; color:#fff; border:1px solid #374151; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .tab-button.active { background:#fff; color:#111827; border-color:#fff;}
+    .tab-content { display:none; background:#0b1220; border-radius:12px; }
+    .tab-content.active { display:block; }
+    .tab-content.tradingview { background: transparent; }
+    .tradingview-container { width:100%; height:min(90vh, 900px); background:#0b1220; border-radius:12px; overflow:hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+    .iframe-container { width:100%; height:800px; }
+    iframe { width:100%; height:100%; border:none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Reordered buttons: TradingView, T2D Pulse, CEORater -->
+    <div class="tabs">
+      <button class="tab-button active" onclick="switchTab(0)">TradingView</button>
+      <button class="tab-button" onclick="switchTab(1)">T2D Pulse</button>
+      <button class="tab-button" onclick="switchTab(2)">CEORater</button>
+    </div>
+
+    <!-- Reordered contents to match buttons; TradingView active by default -->
+    <div class="tab-content tradingview active">
+      <div class="tradingview-container">
+        <div id="tradingview-widget" style="width:100%;height:100%;"></div>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <div class="iframe-container">
+        <iframe src="https://pulse.tek2dayholdings.com" title="T2D Pulse"></iframe>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <div class="iframe-container">
+        <iframe src="https://ceorater.com" title="CEORater"></iframe>
+      </div>
+    </div>
+
+    <script id="tvjs" src="https://s3.tradingview.com/tv.js" defer></script>
+    <script>
+      const TVReady = new Promise((resolve) => {
+        function onReady(){ if (window.TradingView && window.TradingView.widget) resolve(); }
+        if (window.TradingView && window.TradingView.widget) resolve();
+        else {
+          const s = document.getElementById('tvjs');
+          if (s) s.addEventListener('load', onReady, { once:true });
+          const check = setInterval(() => {
+            if (window.TradingView && window.TradingView.widget) { clearInterval(check); resolve(); }
+          }, 50);
+        }
+      });
+
+      async function initTradingView() {
+        const el = document.getElementById('tradingview-widget');
+        if (!el || el.dataset.initialized === '1') return;
+        await TVReady;
+        el.dataset.initialized = '1';
+        new TradingView.widget({
+          autosize: true,
+          container_id: 'tradingview-widget',
+          symbol: 'NASDAQ:AAPL',
+          interval: 'D',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          theme: 'dark',
+          style: 1,
+          locale: 'en',
+          hide_top_toolbar: false,     // keep header so symbol search is visible
+          hide_side_toolbar: false,
+          allow_symbol_change: true,
+          details: true,
+          studies: ['MAExp@tv-basicstudies', 'RSI@tv-basicstudies', 'MACD@tv-basicstudies']
+        });
+      }
+
+      function switchTab(index) {
+        const tabs = document.querySelectorAll('.tab-content');
+        const buttons = document.querySelectorAll('.tab-button');
+        tabs.forEach(t => t.classList.remove('active'));
+        buttons.forEach(b => b.classList.remove('active'));
+        tabs[index].classList.add('active');
+        buttons[index].classList.add('active');
+
+        // Initialize TradingView if the activated tab is the TradingView one
+        if (tabs[index].classList.contains('tradingview')) {
+          initTradingView();
+        }
+      }
+
+      // Since TradingView is the default active tab now, init it on load too
+      window.addEventListener('DOMContentLoaded', () => {
+        if (document.querySelector('.tab-content.tradingview.active')) initTradingView();
+      });
+    </script>
+  </div>
+</body>
+</html>
