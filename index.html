@@ -2,12 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Updated: add viewport-fit=cover for iPhone safe areas -->
+  <!-- Safe for iPhone notches -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <title>TEK2day Dash</title>
+
+  <!-- Manifest & icons -->
   <link rel="manifest" href="/manifest.webmanifest">
-  <!-- Open Graph / Twitter social preview -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- Social preview (optional; safe to keep) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="TEK2day Dashboard">
   <meta property="og:description" content="T2D Dashboard: TradingView, T2D Pulse, CEORater and OpenAI — all in one place.">
@@ -20,18 +27,14 @@
   <meta name="twitter:description" content="T2D Dashboard: TradingView, T2D Pulse, CEORater and OpenAI — all in one place.">
   <meta name="twitter:image" content="https://dash.tek2dayholdings.com/T2D_Dash_Social_Banner.png">
 
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="icon" href="/favicon.ico">
   <style>
-    /* Original styles (unchanged) */
+    /* Original styles (kept) */
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: #0f172a; min-height: 100vh; padding: 40px 20px; color:#e5e7eb;}
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: #0f172a; min-height: 100vh; padding: 40px 20px; color:#e5e7eb; }
     .container { max-width: 1200px; margin: 0 auto; }
-    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center;}
+    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
     .tab-button { background: #1f2937; color:#fff; border:1px solid #374151; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600; }
-    .tab-button.active { background:#fff; color:#111827; border-color:#fff;}
+    .tab-button.active { background:#fff; color:#111827; border-color:#fff; }
     .tab-content { display:none; background:#0b1220; border-radius:12px; }
     .tab-content.active { display:block; }
     .tab-content.tradingview { background: transparent; }
@@ -43,8 +46,7 @@
     #installBanner small { opacity: .8; }
     #iosTip { position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px; background:#111827; color:#f9fafb; border:1px solid #374151; padding:10px 14px; border-radius:10px; display:none; }
     @media all and (display-mode: standalone) { body { padding: 20px; } }
-  
-    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
+
     .tabs .brand { display:flex; align-items:center; gap:10px; margin-right:6px; text-decoration:none; }
     .tabs .brand img { height:28px; width:auto; border-radius:8px; }
 
@@ -55,55 +57,52 @@
     }
 
     @media (max-width: 768px) {
-      /* Override only horizontal & bottom padding to respect notches */
+      /* Respect notches/safe areas; only adjust padding, not layout */
       body {
         padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
         padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
         padding-bottom: max(var(--t2d-pad), env(safe-area-inset-bottom, 0px));
       }
 
-      /* Keep content centered without extra side padding (body handles it) */
       .container {
         margin-left: auto;
         margin-right: auto;
         max-width: 1200px;
       }
 
-      /* Gentle vertical rhythm between sections without changing display */
-      .tab-content { 
+      .tab-content {
         margin-top: var(--t2d-gap);
         margin-bottom: var(--t2d-gap);
       }
 
-      /* Make tab row breathe on narrow screens and respect safe areas */
       .tabs {
         padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
         padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
       }
 
-      /* Images scale safely on very narrow phones */
       img { max-width: 100%; height: auto; }
     }
 
     @media (max-width: 400px) {
       :root { --t2d-pad: 12px; --t2d-gap: 10px; }
     }
-  
-    /* Expand CEORater iframe edge-to-edge on small screens so its internal grid hits a cleaner breakpoint */
+
+    /* Edge-to-edge ONLY for CEORater iframe so its internal grid hits cleaner breakpoints */
     @media (max-width: 768px) {
       .edge-to-edge {
         margin-left: calc(-1 * (var(--t2d-pad) + env(safe-area-inset-left, 0px)));
         margin-right: calc(-1 * (var(--t2d-pad) + env(safe-area-inset-right, 0px)));
-        width: auto; /* let it naturally fill to viewport edges */
+        width: auto;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Tabs -->
     <div class="tabs">
       <a class="brand" href="https://tek2day.com" aria-label="TEK2day">
-        <img src="android-chrome-192x192.png" alt="TEK2day logo" loading="lazy" decoding="async">
+        <img src="/android-chrome-192x192.png" alt="TEK2day logo" loading="lazy" decoding="async">
       </a>
 
       <button class="tab-button active" onclick="switchTab(0)">TradingView</button>
@@ -112,31 +111,35 @@
       <button class="tab-button" onclick="switchTab(3)">OpenAI</button>
     </div>
 
+    <!-- TradingView -->
     <div class="tab-content tradingview active">
       <div class="tradingview-container">
         <div id="tradingview-widget" style="width:100%;height:100%;"></div>
       </div>
     </div>
 
+    <!-- T2D Pulse -->
     <div class="tab-content">
       <div class="iframe-container">
         <iframe src="https://pulse.tek2dayholdings.com" title="T2D Pulse"></iframe>
       </div>
     </div>
 
+    <!-- CEORater (edge-to-edge on mobile for cleaner card sizing) -->
     <div class="tab-content">
       <div class="iframe-container edge-to-edge">
-      <iframe src="https://ceorater.com" title="CEORater"></iframe>
+        <iframe src="https://ceorater.com" title="CEORater"></iframe>
       </div>
     </div>
 
-
+    <!-- OpenAI -->
     <div class="tab-content">
       <div class="iframe-container">
         <iframe src="https://openai.com" title="OpenAI" allow="fullscreen; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
     </div>
 
+    <!-- Install banner (unchanged) -->
     <div id="installBanner" aria-label="Install TEK2day Dashboard">
       <span>Install TEK2day Dashboard</span>
       <button id="installBtn">Install TEK2day Dashboard</button>
@@ -144,8 +147,24 @@
     </div>
     <div id="iosTip">On iOS: tap <strong>Share</strong> → <strong>Add to Home Screen</strong>.</div>
 
+    <!-- Update-available toast (NEW) -->
+    <div id="updateToast" style="
+      position:fixed;left:50%;transform:translateX(-50%);
+      bottom:16px;background:#111827;color:#f9fafb;border:1px solid #374151;
+      padding:10px 14px;border-radius:10px;display:none;z-index:9999">
+      A new version is available.
+      <button id="refreshBtn" style="
+        margin-left:10px;padding:6px 10px;border-radius:8px;
+        border:none;background:#22c55e;color:#052e16;font-weight:700;cursor:pointer">
+        Refresh
+      </button>
+    </div>
+
+    <!-- TradingView script -->
     <script id="tvjs" src="https://s3.tradingview.com/tv.js" defer></script>
+
     <script>
+      // TradingView readiness
       const TVReady = new Promise((resolve) => {
         function onReady(){ if (window.TradingView && window.TradingView.widget) resolve(); }
         if (window.TradingView && window.TradingView.widget) resolve();
@@ -194,12 +213,7 @@
         if (document.querySelector('.tab-content.tradingview.active')) initTradingView();
       });
 
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js').catch(console.error);
-        });
-      }
-
+      // PWA install banner
       let deferredPrompt = null;
       const banner = document.getElementById('installBanner');
       const installBtn = document.getElementById('installBtn');
@@ -225,12 +239,53 @@
         banner.style.display = 'none';
       });
 
+      // iOS hint
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
       const isInStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
       if (isIOS && !isInStandalone) {
         const tip = document.getElementById('iosTip');
         tip.style.display = 'block';
         setTimeout(() => tip.style.display = 'none', 8000);
+      }
+
+      // Service worker registration with "update available" toast
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const reg = await navigator.serviceWorker.register('/service-worker.js');
+
+            const showUpdateToast = () => {
+              const toast = document.getElementById('updateToast');
+              if (!toast) return;
+              toast.style.display = 'block';
+              const btn = document.getElementById('refreshBtn');
+              if (btn) btn.onclick = () => reg.waiting?.postMessage('SKIP_WAITING');
+            };
+
+            // If a worker is already waiting (return visits), prompt immediately
+            if (reg.waiting) showUpdateToast();
+
+            // When a new worker is found, wait for it to finish installing
+            reg.addEventListener('updatefound', () => {
+              const sw = reg.installing;
+              sw?.addEventListener('statechange', () => {
+                if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+                  showUpdateToast();
+                }
+              });
+            });
+
+            // When the new worker activates (after SKIP_WAITING), reload to swap versions
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (refreshing) return;
+              refreshing = true;
+              window.location.reload();
+            });
+          } catch (e) {
+            console.error('SW registration failed', e);
+          }
+        });
       }
     </script>
   </div>
