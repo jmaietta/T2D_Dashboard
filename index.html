@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Updated: add viewport-fit=cover for iPhone safe areas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <title>TEK2day Dash</title>
   <link rel="manifest" href="manifest.webmanifest">
@@ -24,6 +25,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="icon" href="favicon.ico">
   <style>
+    /* Original styles (unchanged) */
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: #0f172a; min-height: 100vh; padding: 40px 20px; color:#e5e7eb;}
     .container { max-width: 1200px; margin: 0 auto; }
@@ -44,9 +46,48 @@
   
     .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
     .tabs .brand { display:flex; align-items:center; gap:10px; margin-right:6px; text-decoration:none; }
-    
-
     .tabs .brand img { height:28px; width:auto; border-radius:8px; }
+
+    /* === Minimal, non-breaking mobile margins & safe-area padding === */
+    :root {
+      --t2d-pad: clamp(12px, 4vw, 24px);
+      --t2d-gap: clamp(10px, 3.5vw, 18px);
+    }
+
+    @media (max-width: 768px) {
+      /* Override only horizontal & bottom padding to respect notches */
+      body {
+        padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
+        padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
+        padding-bottom: max(var(--t2d-pad), env(safe-area-inset-bottom, 0px));
+      }
+
+      /* Keep content centered without extra side padding (body handles it) */
+      .container {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 1200px;
+      }
+
+      /* Gentle vertical rhythm between sections without changing display */
+      .tab-content { 
+        margin-top: var(--t2d-gap);
+        margin-bottom: var(--t2d-gap);
+      }
+
+      /* Make tab row breathe on narrow screens and respect safe areas */
+      .tabs {
+        padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
+        padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
+      }
+
+      /* Images scale safely on very narrow phones */
+      img { max-width: 100%; height: auto; }
+    }
+
+    @media (max-width: 400px) {
+      :root { --t2d-pad: 12px; --t2d-gap: 10px; }
+    }
   </style>
 </head>
 <body>
