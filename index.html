@@ -6,6 +6,19 @@
   <meta name="theme-color" content="#0f172a" />
   <title>TEK2day Dash</title>
   <link rel="manifest" href="manifest.webmanifest">
+  <!-- Open Graph / Twitter social preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TEK2day Dashboard">
+  <meta property="og:description" content="Live markets, TradingView, Pulse, CEORater — all in one TEK2day dashboard.">
+  <meta property="og:url" content="https://dash.tek2dayholdings.com/">
+  <meta property="og:image" content="https://dash.tek2dayholdings.com/T2D_Dash_Social_Banner.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TEK2day Dashboard">
+  <meta name="twitter:description" content="Live markets, TradingView, Pulse, CEORater — all in one TEK2day dashboard.">
+  <meta name="twitter:image" content="https://dash.tek2dayholdings.com/T2D_Dash_Social_Banner.png">
+
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -28,11 +41,21 @@
     #installBanner small { opacity: .8; }
     #iosTip { position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px; background:#111827; color:#f9fafb; border:1px solid #374151; padding:10px 14px; border-radius:10px; display:none; }
     @media all and (display-mode: standalone) { body { padding: 20px; } }
+  
+    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
+    .tabs .brand { display:flex; align-items:center; gap:10px; margin-right:6px; text-decoration:none; }
+    
+
+    .tabs .brand img { height:28px; width:auto; border-radius:8px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="tabs">
+      <a class="brand" href="https://tek2day.com" aria-label="TEK2day">
+        <img src="android-chrome-192x192.png" alt="TEK2day logo" loading="lazy" decoding="async">
+      </a>
+
       <button class="tab-button active" onclick="switchTab(0)">TradingView</button>
       <button class="tab-button" onclick="switchTab(1)">T2D Pulse</button>
       <button class="tab-button" onclick="switchTab(2)">CEORater</button>
