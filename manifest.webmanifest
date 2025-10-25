@@ -1,0 +1,24 @@
+{
+  "name": "Tek2Day Tools",
+  "short_name": "T2D Tools",
+  "description": "Tek2Day dashboard with TradingView, T2D Pulse, and CEORater.",
+  "start_url": "tradingview_pwa.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
