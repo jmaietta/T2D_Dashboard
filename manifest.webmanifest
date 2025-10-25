@@ -1,6 +1,6 @@
 {
-  "name": "Tek2Day Tools",
-  "short_name": "T2D Tools",
+  "name": "TEK2day Dashboard",
+  "short_name": "TEK2day Dash",
   "description": "Tek2Day dashboard with TradingView, T2D Pulse, and CEORater.",
   "start_url": "tradingview_pwa.html",
   "scope": "./",
