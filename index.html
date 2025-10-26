@@ -28,7 +28,7 @@
   <meta name="twitter:image" content="https://dash.tek2dayholdings.com/T2D_Dash_Social_Banner.png">
 
   <style>
-    /* Original styles (kept) */
+    /* Base */
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: #0f172a; min-height: 100vh; padding: 40px 20px; color:#e5e7eb; }
     .container { max-width: 1200px; margin: 0 auto; }
@@ -41,6 +41,7 @@
     .tradingview-container { width:100%; height:min(90vh, 900px); background:#0b1220; border-radius:12px; overflow:hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
     .iframe-container { width:100%; height:800px; }
     iframe { width:100%; height:100%; border:none; }
+
     #installBanner { position: fixed; right: 16px; bottom: 16px; background:#111827; color:#f9fafb; border:1px solid #374151; padding:12px 16px; border-radius:12px; display:none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
     #installBanner button { background:#22c55e; color:#052e16; border:none; padding:8px 12px; border-radius:10px; font-weight:700; cursor:pointer; margin-left:10px; }
     #installBanner small { opacity: .8; }
@@ -50,20 +51,15 @@
     .tabs .brand { display:flex; align-items:center; gap:10px; margin-right:6px; text-decoration:none; }
     .tabs .brand img { height:28px; width:auto; border-radius:8px; }
 
-    /* === Minimal, non-breaking mobile margins & safe-area padding === */
-    :root {
-      --t2d-pad: clamp(12px, 4vw, 24px);
-      --t2d-gap: clamp(10px, 3.5vw, 18px);
-    }
+    /* Minimal, non-breaking mobile margins & safe-area padding */
+    :root { --t2d-pad: clamp(12px, 4vw, 24px); --t2d-gap: clamp(10px, 3.5vw, 18px); }
 
     @media (max-width: 768px) {
-      /* Respect notches/safe areas; only adjust padding, not layout */
       body {
         padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
         padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
         padding-bottom: max(var(--t2d-pad), env(safe-area-inset-bottom, 0px));
       }
-
       .container { margin-left: auto; margin-right: auto; max-width: 1200px; }
       .tab-content { margin-top: var(--t2d-gap); margin-bottom: var(--t2d-gap); }
       .tabs { padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px)); padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px)); }
@@ -72,7 +68,7 @@
 
     @media (max-width: 400px) { :root { --t2d-pad: 12px; --t2d-gap: 10px; } }
 
-    /* Edge-to-edge ONLY for CEORater iframe so its internal grid hits cleaner breakpoints */
+    /* Edge-to-edge ONLY for CEORater iframe on its full tab (mobile) */
     @media (max-width: 768px) {
       .edge-to-edge {
         margin-left: calc(-1 * (var(--t2d-pad) + env(safe-area-inset-left, 0px)));
@@ -81,27 +77,25 @@
       }
     }
 
-    /* ====== Home tab additions (TradingView centerpiece, Pulse right, CEORater below, FinModel below CEORater) ====== */
-    .home-grid { display: grid; gap: var(--t2d-gap); }
+    /* ===== Home layout (all cards fixed to 550px) ===== */
+    .home-grid { display:grid; gap: var(--t2d-gap); }
 
-    /* Desktop/tablet: two columns; Pulse spans all three left rows */
+    /* Desktop/tablet: 2 columns x 2 rows */
     @media (min-width: 1024px) {
       .home-grid {
         grid-template-columns: 1.6fr 1fr;      /* left wider */
-        grid-template-rows: auto auto auto;    /* three rows on the left */
         grid-template-areas:
           "tv   pulse"
-          "ceo  pulse"
-          "fin  pulse";
+          "ceo  fin";
         align-items: start;
       }
       .home-tv { grid-area: tv; }
+      .home-pulse { grid-area: pulse; }
       .home-ceorater { grid-area: ceo; }
       .home-finmodel { grid-area: fin; }
-      .home-pulse { grid-area: pulse; }
     }
 
-    /* Mobile: stack TV → Pulse → CEORater → FinModel */
+    /* Mobile: stack in DOM order */
     @media (max-width: 1023.98px) {
       .home-grid > * + * { margin-top: var(--t2d-gap); }
     }
@@ -111,6 +105,9 @@
       border-radius: 12px;
       padding: min(20px, 4.5vw);
       box-shadow: 0 8px 30px rgba(0,0,0,.35);
+      display: flex;
+      flex-direction: column;
+      height: 550px;               /* <<<<<<<<<< ALL CARDS = 550px */
     }
     .home-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
     .home-head h2 { font-size: clamp(16px, 4.2vw, 20px); margin: 0; }
@@ -119,24 +116,9 @@
       padding: 6px 10px; border-radius: 999px; cursor: pointer; font-weight: 600;
     }
 
-    /* Heights */
-    .home-tv-body { height: 440px; }            /* centerpiece TV height */
-    .home-frame   { border-radius: 10px; overflow: hidden; }
-    .home-frame iframe { width: 100%; height: 100%; border: 0; }
-
-    /* Specific card heights */
-    .home-ceorater .home-frame { height: 420px; }
-    .home-finmodel .home-frame { height: 500px; }
-
-    /* Make Pulse span the full combined height of the left column (desktop) */
-    @media (min-width: 1024px) {
-      .home-pulse .home-frame {
-        height: calc(440px + 420px + 500px + (2 * var(--t2d-gap)));
-      }
-    }
-    @media (max-width: 1023.98px) {
-      .home-pulse .home-frame { height: 480px; }
-    }
+    /* Frames fill remaining space under card headers */
+    .home-frame, .home-tv-body { border-radius: 10px; overflow: hidden; flex: 1 1 auto; min-height: 0; }
+    .home-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
   </style>
 </head>
 <body>
@@ -150,7 +132,7 @@
       <!-- Home first -->
       <button class="tab-button active" onclick="switchTab(0)">Home</button>
 
-      <!-- Existing tabs shifted, and FinModel added before OpenAI -->
+      <!-- Existing tabs; FinModel before OpenAI -->
       <button class="tab-button" onclick="switchTab(1)">TradingView</button>
       <button class="tab-button" onclick="switchTab(2)">T2D Pulse</button>
       <button class="tab-button" onclick="switchTab(3)">CEORater</button>
@@ -161,7 +143,7 @@
     <!-- HOME -->
     <div class="tab-content home active">
       <div class="home-grid">
-        <!-- TradingView centerpiece (FULL chart) -->
+        <!-- TradingView -->
         <section class="home-card home-tv">
           <div class="home-head">
             <h2>Markets</h2>
@@ -172,7 +154,22 @@
           </div>
         </section>
 
-        <!-- CEORater (below TV) -->
+        <!-- T2D Pulse (right, top) -->
+        <section class="home-card home-pulse">
+          <div class="home-head">
+            <h2>T2D Pulse</h2>
+            <button class="chip" onclick="switchTab(2)">Open full</button>
+          </div>
+          <div class="home-frame">
+            <iframe
+              data-src="https://pulse.tek2dayholdings.com"
+              title="T2D Pulse"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </section>
+
+        <!-- CEORater (left, bottom) -->
         <section class="home-card home-ceorater">
           <div class="home-head">
             <h2>CEORater</h2>
@@ -187,11 +184,10 @@
           </div>
         </section>
 
-        <!-- FinModel (below CEORater) -->
+        <!-- FinModel (right, bottom) -->
         <section class="home-card home-finmodel">
           <div class="home-head">
             <h2>FinModel</h2>
-            <!-- MATCHED BUTTON: same look/behavior as others -->
             <button class="chip" onclick="switchTab(4)">Open full</button>
           </div>
           <div class="home-frame">
@@ -202,21 +198,6 @@
               referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </section>
-
-        <!-- T2D Pulse (right column spanning all rows) -->
-        <aside class="home-card home-pulse">
-          <div class="home-head">
-            <h2>T2D Pulse</h2>
-            <button class="chip" onclick="switchTab(2)">Open full</button>
-          </div>
-          <div class="home-frame">
-            <iframe
-              data-src="https://pulse.tek2dayholdings.com"
-              title="T2D Pulse"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"></iframe>
-          </div>
-        </aside>
       </div>
     </div>
 
@@ -352,28 +333,28 @@
         tabs[index].classList.add('active');
         buttons[index].classList.add('active');
 
-        // Initialize charts as needed
-        if (index === 0) initTradingViewHome();           // Home chart
-        if (tabs[index].classList.contains('tradingview')) initTradingView(); // Full chart
+        // Initialize charts on demand
+        if (index === 0) initTradingViewHome();
+        if (tabs[index].classList.contains('tradingview')) initTradingView();
 
-        // Lazy-load Home iframes when Home tab is shown
+        // Lazy-load Home iframes when Home is shown
         if (index === 0) {
-          document.querySelectorAll('.home-frame iframe[data-src]').forEach(f => {
+          document.querySelectorAll('.home-frame iframe[data-src], .home-tv-body iframe[data-src]').forEach(f => {
             if (!f.src) f.src = f.dataset.src;
           });
         }
       }
 
       window.addEventListener('DOMContentLoaded', () => {
-        // Initialize the Home TradingView chart on load
+        // Initialize Home chart immediately
         initTradingViewHome();
 
         // If TradingView full tab is active on load, initialize it
         if (document.querySelector('.tab-content.tradingview.active')) initTradingView();
 
-        // Lazy-load Home iframes on first paint as they come into view
+        // Lazy-load Home iframes as they appear
         (function lazyHomeFrames(){
-          const iframes = document.querySelectorAll('.home-frame iframe[data-src]');
+          const iframes = document.querySelectorAll('.home-frame iframe[data-src], .home-tv-body iframe[data-src]');
           if (!('IntersectionObserver' in window) || iframes.length === 0) {
             iframes.forEach(f => { if (!f.src) f.src = f.dataset.src; });
             return;
