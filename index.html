@@ -81,25 +81,27 @@
       }
     }
 
-    /* ====== Home tab additions (TradingView centerpiece, Pulse right, CEORater below) ====== */
+    /* ====== Home tab additions (TradingView centerpiece, Pulse right, CEORater below, FinModel below CEORater) ====== */
     .home-grid { display: grid; gap: var(--t2d-gap); }
 
-    /* Desktop/tablet: two columns; Pulse spans both rows on right */
+    /* Desktop/tablet: two columns; Pulse spans all three left rows */
     @media (min-width: 1024px) {
       .home-grid {
         grid-template-columns: 1.6fr 1fr;      /* left wider */
-        grid-template-rows: auto auto;         /* two rows on the left */
+        grid-template-rows: auto auto auto;    /* three rows on the left */
         grid-template-areas:
           "tv   pulse"
-          "ceo  pulse";
+          "ceo  pulse"
+          "fin  pulse";
         align-items: start;
       }
       .home-tv { grid-area: tv; }
       .home-ceorater { grid-area: ceo; }
+      .home-finmodel { grid-area: fin; }
       .home-pulse { grid-area: pulse; }
     }
 
-    /* Mobile: stack TV → Pulse → CEORater */
+    /* Mobile: stack TV → Pulse → CEORater → FinModel */
     @media (max-width: 1023.98px) {
       .home-grid > * + * { margin-top: var(--t2d-gap); }
     }
@@ -119,11 +121,22 @@
 
     /* Heights */
     .home-tv-body { height: 440px; }            /* centerpiece TV height */
-    .home-frame   { height: 420px; border-radius: 10px; overflow: hidden; }
+    .home-frame   { border-radius: 10px; overflow: hidden; }
     .home-frame iframe { width: 100%; height: 100%; border: 0; }
 
-    /* Give Pulse more vertical space since it spans both rows */
-    @media (min-width: 1024px) { .home-pulse .home-frame { height: 900px; } }
+    /* Specific card heights */
+    .home-ceorater .home-frame { height: 420px; }
+    .home-finmodel .home-frame { height: 500px; }
+
+    /* Make Pulse span the full combined height of the left column (desktop) */
+    @media (min-width: 1024px) {
+      .home-pulse .home-frame {
+        height: calc(440px + 420px + 500px + (2 * var(--t2d-gap)));
+      }
+    }
+    @media (max-width: 1023.98px) {
+      .home-pulse .home-frame { height: 480px; }
+    }
   </style>
 </head>
 <body>
@@ -134,17 +147,18 @@
         <img src="/android-chrome-192x192.png" alt="TEK2day logo" loading="lazy" decoding="async">
       </div>
 
-      <!-- NEW: Home first -->
+      <!-- Home first -->
       <button class="tab-button active" onclick="switchTab(0)">Home</button>
 
-      <!-- Existing tabs shifted by +1 index each -->
+      <!-- Existing tabs shifted, and FinModel added before OpenAI -->
       <button class="tab-button" onclick="switchTab(1)">TradingView</button>
       <button class="tab-button" onclick="switchTab(2)">T2D Pulse</button>
       <button class="tab-button" onclick="switchTab(3)">CEORater</button>
-      <button class="tab-button" onclick="switchTab(4)">OpenAI</button>
+      <button class="tab-button" onclick="switchTab(4)">FinModel</button>
+      <button class="tab-button" onclick="switchTab(5)">OpenAI</button>
     </div>
 
-    <!-- NEW: Home tab (full TradingView in centerpiece; Pulse right; CEORater below) -->
+    <!-- HOME -->
     <div class="tab-content home active">
       <div class="home-grid">
         <!-- TradingView centerpiece (FULL chart) -->
@@ -158,7 +172,7 @@
           </div>
         </section>
 
-        <!-- CEORater below TradingView (left column, second row) -->
+        <!-- CEORater (below TV) -->
         <section class="home-card home-ceorater">
           <div class="home-head">
             <h2>CEORater</h2>
@@ -173,7 +187,23 @@
           </div>
         </section>
 
-        <!-- T2D Pulse (right column spanning both rows) -->
+        <!-- FinModel (below CEORater) -->
+        <section class="home-card home-finmodel">
+          <div class="home-head">
+            <h2>FinModel</h2>
+            <!-- MATCHED BUTTON: same look/behavior as others -->
+            <button class="chip" onclick="switchTab(4)">Open full</button>
+          </div>
+          <div class="home-frame">
+            <iframe
+              data-src="https://finmodel.app/"
+              title="FinModel"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </section>
+
+        <!-- T2D Pulse (right column spanning all rows) -->
         <aside class="home-card home-pulse">
           <div class="home-head">
             <h2>T2D Pulse</h2>
@@ -204,10 +234,18 @@
       </div>
     </div>
 
-    <!-- CEORater (full tab; edge-to-edge on mobile for cleaner card sizing) -->
+    <!-- CEORater (full tab; edge-to-edge on mobile) -->
     <div class="tab-content">
       <div class="iframe-container edge-to-edge">
         <iframe src="https://ceorater.com" title="CEORater"></iframe>
+      </div>
+    </div>
+
+    <!-- FinModel (full tab) -->
+    <div class="tab-content">
+      <div class="iframe-container">
+        <iframe src="https://finmodel.app/" title="FinModel"
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </div>
 
