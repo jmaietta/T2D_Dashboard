@@ -31,10 +31,27 @@
     /* Base */
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background: #0f172a; min-height: 100vh; padding: 40px 20px; color:#e5e7eb; }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 20px 12px;
+      }
+    }
     .container { max-width: 1200px; margin: 0 auto; }
     .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; align-items:center; }
-    .tab-button { background: #1f2937; color:#fff; border:1px solid #374151; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .tab-button { background: #1f2937; color:#fff; border:1px solid #374151; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600; white-space: nowrap; font-size: clamp(12px, 2.5vw, 14px); }
     .tab-button.active { background:#fff; color:#111827; border-color:#fff; }
+
+    @media (max-width: 500px) {
+      .tab-button {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .tabs { gap: 8px; }
+      .tabs .brand {
+        margin-right: auto;
+      }
+    }
     .tab-content { display:none; background:#0b1220; border-radius:12px; }
     .tab-content.active { display:block; }
     .tab-content.tradingview { background: transparent; }
@@ -50,6 +67,12 @@
 
     .tabs .brand { display:flex; align-items:center; gap:10px; margin-right:6px; text-decoration:none; }
     .tabs .brand img { height:28px; width:auto; border-radius:8px; }
+
+    @media (max-width: 500px) {
+      .tabs .brand img {
+        height: 24px;
+      }
+    }
 
     /* Minimal, non-breaking mobile margins & safe-area padding */
     :root { --t2d-pad: clamp(12px, 4vw, 24px); --t2d-gap: clamp(10px, 3.5vw, 18px); }
@@ -107,7 +130,8 @@
       box-shadow: 0 8px 30px rgba(0,0,0,.35);
       display: flex;
       flex-direction: column;
-      height: 550px;               /* <<<<<<<<<< ALL CARDS = 550px */
+      height: 550px;               /* ALL CARDS = 550px */
+      overflow: hidden;            /* prevent any mobile spillover */
     }
     .home-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
     .home-head h2 { font-size: clamp(16px, 4.2vw, 20px); margin: 0; }
@@ -119,6 +143,45 @@
     /* Frames fill remaining space under card headers */
     .home-frame, .home-tv-body { border-radius: 10px; overflow: hidden; flex: 1 1 auto; min-height: 0; }
     .home-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+    /* ---- Mobile-only scaling for CEORater preview on Home ---- */
+    .home-ceorater .scale-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .home-ceorater iframe#ceo-home-iframe {
+      transform-origin: 0 0;                /* top-left scaling origin */
+      display: block;
+      border: 0;
+    }
+
+    /* Mobile card height adjustment for better viewport usage */
+    @media (max-width: 768px) {
+      .home-card {
+        height: clamp(300px, 65vh, 480px);
+      }
+      .home-head h2 {
+        font-size: clamp(14px, 3.5vw, 18px);
+      }
+      .home-head {
+        margin-bottom: 8px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .home-card {
+        height: clamp(270px, 58vh, 380px);
+        padding: min(16px, 4vw);
+      }
+      .home-head h2 {
+        font-size: clamp(13px, 3vw, 16px);
+      }
+    }
+
+    /* Ensure CEORater iframe displays cleanly on mobile */
+    @media (max-width: 768px) {
+      .home-ceorater iframe#ceo-home-iframe {
+        width: 100% !important;
+        height: 100% !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -176,11 +239,15 @@
             <button class="chip" onclick="switchTab(3)">Open full</button>
           </div>
           <div class="home-frame">
-            <iframe
-              data-src="https://ceorater.com"
-              title="CEORater"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <!-- Mobile fix: scale the iframe to force uniform desktop layout without overflow -->
+            <div class="scale-wrap">
+              <iframe
+                id="ceo-home-iframe"
+                data-src="https://ceorater.com"
+                title="CEORater"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
           </div>
         </section>
 
@@ -343,6 +410,9 @@
             if (!f.src) f.src = f.dataset.src;
           });
         }
+
+        // Re-scale CEORater preview when returning to Home
+        if (index === 0) requestAnimationFrame(scaleCeoraterPreview);
       }
 
       window.addEventListener('DOMContentLoaded', () => {
@@ -370,7 +440,52 @@
           }, { rootMargin: '200px 0px' });
           iframes.forEach(f => io.observe(f));
         })();
+
+        // Once CEORater iframe loads, scale it (mobile only)
+        const ceoIframe = document.getElementById('ceo-home-iframe');
+        if (ceoIframe) {
+          ceoIframe.addEventListener('load', () => {
+            requestAnimationFrame(scaleCeoraterPreview);
+          });
+        }
       });
+
+      // Debounce helper
+      function debounce(fn, delay=120){
+        let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+      }
+
+      // Scale CEORater preview on mobile so its 4 cards align like desktop
+      function scaleCeoraterPreview(){
+        const wrap = document.querySelector('.home-ceorater .scale-wrap');
+        const iframe = document.getElementById('ceo-home-iframe');
+        if (!wrap || !iframe) return;
+
+        const isDesktop = window.matchMedia('(min-width:1024px)').matches;
+        if (isDesktop) {
+          // Reset to normal on desktop
+          iframe.style.transform = '';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          return;
+        }
+
+        // On mobile: use CSS zoom instead of transform scale for better rendering
+        const available = wrap.clientWidth;
+        const desktopWidth = 1024;
+        const scale = Math.max(0.4, Math.min(1, available / desktopWidth));
+
+        // Use zoom property for crisper rendering on mobile
+        iframe.style.zoom = scale;
+        iframe.style.transformOrigin = 'top left';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+      }
+
+      // Re-scale on resize/orientation changes (mobile)
+      window.addEventListener('resize', debounce(() => {
+        requestAnimationFrame(scaleCeoraterPreview);
+      }, 120));
 
       // PWA install banner
       let deferredPrompt = null;
@@ -397,15 +512,6 @@
         status.textContent = 'Installed!';
         banner.style.display = 'none';
       });
-
-      // iOS hint
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      const isInStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      if (isIOS && !isInStandalone) {
-        const tip = document.getElementById('iosTip');
-        tip.style.display = 'block';
-        setTimeout(() => tip.style.display = 'none', 8000);
-      }
 
       // Service worker registration with "update available" toast
       if ('serviceWorker' in navigator) {
