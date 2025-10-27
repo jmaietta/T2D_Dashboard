@@ -183,43 +183,13 @@
       }
     }
 
-    /* T2D Pulse overlay for clickthrough to full app */
-    .pulse-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      cursor: pointer;
-      z-index: 10;
-      transition: background-color 0.2s ease;
+    /* T2D Pulse - scrollable iframe */
+    .home-pulse .home-frame {
+      position: relative;
     }
-
-    .pulse-overlay:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .pulse-overlay::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 0;
-      height: 0;
-      opacity: 0;
-      transition: all 0.2s ease;
-    }
-
-    .pulse-overlay:hover::after {
-      width: 40px;
-      height: 40px;
-      opacity: 0.7;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
+    
+    .home-pulse iframe {
+      pointer-events: auto;
     }
 
     /* Relative positioning for overlay container */
@@ -241,7 +211,7 @@
 
       <!-- Existing tabs; FinModel before OpenAI -->
       <button class="tab-button" onclick="switchTab(1)">TradingView</button>
-      <button class="tab-button" onclick="switchTab(2)">T2D Pulse</button>
+      <button class="tab-button" onclick="window.open('https://pulse.tek2dayholdings.com/', '_blank')">T2D Pulse</button>
       <button class="tab-button" onclick="switchTab(3)">CEORater</button>
       <button class="tab-button" onclick="switchTab(4)">FinModel</button>
       <button class="tab-button" onclick="switchTab(5)">OpenAI</button>
@@ -269,11 +239,11 @@
           </div>
           <div class="home-frame">
             <iframe
+              id="pulse-iframe"
               data-src="https://pulse.tek2dayholdings.com"
               title="T2D Pulse"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"></iframe>
-            <div class="pulse-overlay" onclick="window.open('https://pulse.tek2dayholdings.com', '_blank')"></div>
           </div>
         </section>
 
@@ -598,6 +568,30 @@
           }
         });
       }
+
+      // Listen for messages from T2D Pulse iframe (article clicks)
+      window.addEventListener('message', (event) => {
+        // Verify the message is from pulse.tek2dayholdings.com
+        if (event.origin === 'https://pulse.tek2dayholdings.com') {
+          if (event.data.type === 'article-click' && event.data.url) {
+            // Open the article URL in current tab
+            window.location.href = event.data.url;
+          }
+        }
+      });
+
+      // Listen for article clicks from T2D Pulse iframe
+      window.addEventListener('message', (event) => {
+        // Security: Only accept messages from pulse.tek2dayholdings.com
+        if (event.origin !== 'https://pulse.tek2dayholdings.com') return;
+        
+        // Check if this is an article click message
+        if (event.data && event.data.type === 'article-click' && event.data.url) {
+          // Navigate the entire page to the article URL
+          window.location.href = event.data.url;
+        }
+      });
+    
     </script>
   </div>
 </body>
