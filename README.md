@@ -2,7 +2,7 @@
 
 **Fintech dashboard that includes TradingView (markets), T2D Pulse (news), CEORater & OpenAI.**
 
-🎥 Demo: https://youtu.be/bg0nnyGh9C8?si=mIsFNrR920a3yHf8
+🎥 Demo: https://youtu.be/gGTeoDeLkVM?si=GTiBhbQHDPSjuxZF
 
 ---
 
