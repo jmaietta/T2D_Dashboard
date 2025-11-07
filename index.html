@@ -269,8 +269,9 @@
         grid-template-columns: 1.6fr 1fr;
         /* left wider */
         grid-template-areas:
-          "tv   pulse"
-          "ceo  fin";
+          "tv    pulse"
+          "ceo   fin"
+          "econ  tekcal";
         align-items: start;
       }
 
@@ -289,9 +290,18 @@
       .home-finmodel {
         grid-area: fin;
       }
+
+      .home-econ-calendar {
+        grid-area: econ;
+      }
+
+      .home-tek-calendar {
+        grid-area: tekcal;
+      }
     }
 
-    /* Mobile: stack in DOM order */
+
+/* Mobile: stack in DOM order */
     @media (max-width: 1023.98px) {
       .home-grid>*+* {
         margin-top: var(--t2d-gap);
@@ -425,10 +435,11 @@
 
       <button class="tab-button" onclick="switchTab(1)">TradingView</button>
       <button class="tab-button" onclick="switchTab(2)">Calendar</button>
+      <button class="tab-button" onclick="switchTab(3)">EPS</button>
       <button class="tab-button" onclick="window.open('https://pulse.tek2dayholdings.com/', '_blank')">T2D Pulse</button>
-      <button class="tab-button" onclick="switchTab(4)">CEORater</button>
-      <button class="tab-button" onclick="switchTab(5)">FinModel</button>
-      <button class="tab-button" onclick="switchTab(6)">OpenAI</button>
+      <button class="tab-button" onclick="switchTab(5)">CEORater</button>
+      <button class="tab-button" onclick="switchTab(6)">FinModel</button>
+      <button class="tab-button" onclick="switchTab(7)">OpenAI</button>
     </div>
 
     <div class="tab-content home active">
@@ -501,6 +512,22 @@
             </div>
           </div>
         </section>
+        <section class="home-card home-tek-calendar">
+          <div class="home-head">
+            <h2>Earnings Calendar</h2>
+            <button class="chip" onclick="switchTab(3)">
+              Open full
+            </button>
+          </div>
+          <div class="home-frame">
+            <iframe
+              data-src="https://calendar.tek2dayholdings.com/"
+              title="Earnings Calendar"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -527,6 +554,13 @@
               }
             </script>
         </div>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <div class="iframe-container">
+        <iframe src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </div>
 
