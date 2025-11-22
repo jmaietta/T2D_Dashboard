@@ -3,436 +3,307 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0f172a" />
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+  
   <title>TEK2day Dash</title>
 
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="icon" href="/favicon.ico">
-
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="TEK2day Dashboard">
-  <meta property="og:description" content="T2D Dashboard: TradingView, T2D Pulse, CEORater and OpenAI — all in one place.">
-  <meta property="og:url" content="https://dash.tek2dayholdings.com/">
-  <meta property="og:image" content="https://dash.tek2dayholdings.com/T2D_Dash_Social_Banner.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="TEK2day Dashboard">
-  <meta name="twitter:description" content="T2D Dashboard: TradingView, T2D Pulse, CEORater and OpenAI — all in one place.">
-  <meta name="twitter:image" content="https://dash.tek2dayholdings.com/T2D_Dash_Social_Banner.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="icon" href="favicon.ico">
 
   <style>
-    /* Base */
+    /* ===== RESET & BASE ===== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: #0f172a;
-      min-height: 100vh;
-      padding: 40px 20px;
       color: #e5e7eb;
+      /* APP-LIKE STRUCTURE: Lock the body, prevent page scroll */
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    @media (max-width: 500px) {
-      body {
-        padding: 20px 12px;
-      }
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
+    /* ===== HEADER & NAVIGATION ===== */
+    .app-header {
+      flex: 0 0 auto; /* Don't shrink or grow */
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1f2937;
+      padding: 12px 20px;
+      z-index: 50;
     }
 
     .tabs {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
       align-items: center;
+      gap: 8px;
+      max-width: 1600px;
+      margin: 0 auto;
+      /* Enable horizontal scroll on small screens (Bloomberg style) */
+      overflow-x: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+      white-space: nowrap;
+      padding-bottom: 4px; /* Space for scroll gesture */
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand img {
+      height: 32px;
+      width: auto;
+      border-radius: 6px;
     }
 
     .tab-button {
-      background: #1f2937;
-      color: #fff;
-      border: 1px solid #374151;
-      padding: 10px 16px;
-      border-radius: 10px;
+      background: transparent;
+      color: #9ca3af;
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
-      white-space: nowrap;
-      font-size: clamp(12px, 2.5vw, 14px);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .tab-button:hover {
+      color: #f3f4f6;
+      background: rgba(255, 255, 255, 0.05);
     }
 
     .tab-button.active {
-      background: #fff;
-      color: #111827;
-      border-color: #fff;
+      background: #1f2937;
+      color: #fff;
+      border-color: #374151;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
-    @media (max-width: 500px) {
-      .tab-button {
-        padding: 8px 12px;
-        font-size: 12px;
-      }
-
-      .tabs {
-        gap: 8px;
-      }
-
-      .tabs .brand {
-        margin-right: auto;
-      }
+    /* ===== MAIN CONTENT AREA ===== */
+    .app-main {
+      flex: 1 1 auto; /* Fill remaining vertical space */
+      position: relative;
+      overflow: hidden; /* Prevent spillover */
+      background: #0b1220;
     }
 
     .tab-content {
       display: none;
-      background: #0b1220;
-      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      /* Important: The content scrolls, not the page */
+      overflow-y: auto; 
+      -webkit-overflow-scrolling: touch;
     }
 
     .tab-content.active {
       display: block;
     }
 
-    .tab-content.tradingview {
-      background: transparent;
-    }
-
-    .tradingview-container {
-      width: 100%;
-      height: min(90vh, 900px);
-      background: #0b1220;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    }
-
+    /* IFRAME CONTAINERS (App Layout) */
     .iframe-container {
       width: 100%;
-      height: 800px;
-      position: relative;
+      height: 100%; /* Fill the parent tab-content exactly */
+      display: flex;
+      flex-direction: column;
     }
 
     iframe {
       width: 100%;
       height: 100%;
       border: none;
+      display: block;
+      background: #fff; /* Default white for non-dark sites */
     }
 
-    /* Full-page tradingview widget container */
-    .tab-content .tradingview-widget-container {
-      width: 100%;
-      height: min(90vh, 900px);
+    /* Dark background for specific containers to avoid white flash */
+    .tab-content.tradingview, 
+    .tab-content.home {
       background: #0b1220;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
 
-    #installBanner {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      background: #111827;
-      color: #f9fafb;
-      border: 1px solid #374151;
-      padding: 12px 16px;
-      border-radius: 12px;
-      display: none;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    /* ===== HOME DASHBOARD GRID ===== */
+    .home-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    #installBanner button {
-      background: #22c55e;
-      color: #052e16;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    #installBanner small {
-      opacity: .8;
-    }
-
-    #iosTip {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 16px;
-      background: #111827;
-      color: #f9fafb;
-      border: 1px solid #374151;
-      padding: 10px 14px;
-      border-radius: 10px;
-      display: none;
-    }
-
-    @media all and (display-mode: standalone) {
-      body {
-        padding: 20px;
-      }
-    }
-
-    .tabs .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-right: 6px;
-      text-decoration: none;
-    }
-
-    .tabs .brand img {
-      height: 28px;
-      width: auto;
-      border-radius: 8px;
-    }
-
-    @media (max-width: 500px) {
-      .tabs .brand img {
-        height: 24px;
-      }
-    }
-
-    /* Minimal, non-breaking mobile margins & safe-area padding */
-    :root {
-      --t2d-pad: clamp(12px, 4vw, 24px);
-      --t2d-gap: clamp(10px, 3.5vw, 18px);
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
-        padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
-        padding-bottom: max(var(--t2d-pad), env(safe-area-inset-bottom, 0px));
-      }
-
-      .container {
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 1200px;
-      }
-
-      .tab-content {
-        margin-top: var(--t2d-gap);
-        margin-bottom: var(--t2d-gap);
-      }
-
-      .tabs {
-        padding-left: calc(var(--t2d-pad) + env(safe-area-inset-left, 0px));
-        padding-right: calc(var(--t2d-pad) + env(safe-area-inset-right, 0px));
-      }
-
-      img {
-        max-width: 100%;
-        height: auto;
-      }
-    }
-
-    @media (max-width: 400px) {
-      :root {
-        --t2d-pad: 12px;
-        --t2d-gap: 10px;
-      }
-    }
-
-    /* Edge-to-edge ONLY for CEORater iframe on its full tab (mobile) */
-    @media (max-width: 768px) {
-      .edge-to-edge {
-        margin-left: calc(-1 * (var(--t2d-pad) + env(safe-area-inset-left, 0px)));
-        margin-right: calc(-1 * (var(--t2d-pad) + env(safe-area-inset-right, 0px)));
-        width: auto;
-      }
-    }
-
-    /* ===== Home layout (all cards fixed to 550px) ===== */
     .home-grid {
       display: grid;
-      gap: var(--t2d-gap);
+      gap: 20px;
+      padding-bottom: 40px; /* Bottom spacing for scroll */
     }
 
-    /* Desktop/tablet: 2 columns x 2 rows */
+    /* Desktop Layout */
     @media (min-width: 1024px) {
       .home-grid {
         grid-template-columns: 1.6fr 1fr;
-        /* left wider */
         grid-template-areas:
           "tv    pulse"
           "ceo   fin"
           "econ  tekcal";
         align-items: start;
       }
-
-      .home-tv {
-        grid-area: tv;
-      }
-
-      .home-pulse {
-        grid-area: pulse;
-      }
-
-      .home-ceorater {
-        grid-area: ceo;
-      }
-
-      .home-finmodel {
-        grid-area: fin;
-      }
-
-      .home-econ-calendar {
-        grid-area: econ;
-      }
-
-      .home-tek-calendar {
-        grid-area: tekcal;
-      }
+      .home-tv { grid-area: tv; }
+      .home-pulse { grid-area: pulse; }
+      .home-ceorater { grid-area: ceo; }
+      .home-finmodel { grid-area: fin; }
+      .home-econ-calendar { grid-area: econ; }
+      .home-tek-calendar { grid-area: tekcal; }
     }
 
-
-/* Mobile: stack in DOM order */
+    /* Mobile: Stacked */
     @media (max-width: 1023.98px) {
-      .home-grid>*+* {
-        margin-top: var(--t2d-gap);
+      .home-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
       }
     }
 
     .home-card {
-      background: #0b1220;
+      background: #111827;
+      border: 1px solid #1f2937;
       border-radius: 12px;
-      padding: min(20px, 4.5vw);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, .35);
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      height: 550px;
-      /* ALL CARDS = 550px */
-      overflow: hidden;
-      /* prevent any mobile spillover */
+      height: 500px; /* consistent card height */
+      position: relative;
     }
 
     .home-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .home-head h2 {
-      font-size: clamp(16px, 4.2vw, 20px);
-      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #f3f4f6;
     }
 
     .chip {
-      background: #1f2937;
+      background: #374151;
       color: #e5e7eb;
-      border: 1px solid #374151;
-      padding: 6px 10px;
-      border-radius: 999px;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.2s;
     }
+    .chip:hover { background: #4b5563; }
 
-    /* Frames fill remaining space under card headers */
-    .home-frame,
-    .home-tv-body {
-      border-radius: 10px;
-      overflow: hidden;
-      flex: 1 1 auto;
-      min-height: 0;
-    }
-
-    .home-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-    }
-
-    /* ---- Mobile-only scaling for CEORater preview on Home ---- */
-    .home-ceorater .scale-wrap {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .home-ceorater iframe#ceo-home-iframe {
-      transform-origin: 0 0;
-      /* top-left scaling origin */
-      display: block;
-      border: 0;
-    }
-
-    /* Mobile card height adjustment for better viewport usage */
-    @media (max-width: 768px) {
-      .home-card {
-        height: clamp(300px, 65vh, 480px);
-      }
-
-      .home-head h2 {
-        font-size: clamp(14px, 3.5vw, 18px);
-      }
-
-      .home-head {
-        margin-bottom: 8px;
-      }
-    }
-
-    @media (max-width: 500px) {
-      .home-card {
-        height: clamp(270px, 58vh, 380px);
-        padding: min(16px, 4vw);
-      }
-
-      .home-head h2 {
-        font-size: clamp(13px, 3vw, 16px);
-      }
-    }
-
-    /* Ensure CEORater iframe displays cleanly on mobile */
-    @media (max-width: 768px) {
-      .home-ceorater iframe#ceo-home-iframe {
-        width: 100% !important;
-        height: 100% !important;
-      }
-    }
-
-    /* T2D Pulse - scrollable iframe */
-    .home-pulse .home-frame {
-      position: relative;
-    }
-
-    .home-pulse iframe {
-      pointer-events: auto;
-    }
-
-    /* Relative positioning for overlay container */
     .home-frame {
+      flex: 1;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
       position: relative;
+    }
+
+    /* Specific fixes for home widgets */
+    #tv-home-widget { border-radius: 8px; }
+    
+    /* CEORater Preview Scale Logic */
+    .scale-wrap {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      /* Ensure clean cropping */
+      border-radius: 8px;
+    }
+    
+    /* MOBILE OPTIMIZATIONS */
+    @media (max-width: 768px) {
+      .app-header {
+        padding: 10px 16px;
+      }
+      .home-container {
+        padding: 12px;
+      }
+      .home-card {
+        height: 400px;
+      }
+      .tabs {
+        gap: 6px;
+      }
+      .tab-button {
+        font-size: 13px;
+        padding: 6px 12px;
+      }
+      .brand img {
+        height: 28px;
+      }
+    }
+
+    /* PWA Install Banner */
+    #installBanner {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: #1f2937;
+      color: #fff;
+      border: 1px solid #374151;
+      padding: 12px 16px;
+      border-radius: 10px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+    #installBanner button {
+      background: #22c55e;
+      color: #052e16;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-left: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="tabs">
+
+  <header class="app-header">
+    <nav class="tabs">
       <div class="brand" aria-label="TEK2day">
-        <img src="/android-chrome-192x192.png" alt="TEK2day logo" loading="lazy" decoding="async">
+        <img src="android-chrome-192x192.png" alt="T2D" loading="lazy">
       </div>
-
+      
       <button class="tab-button active" onclick="switchTab(0)">Home</button>
-
       <button class="tab-button" onclick="switchTab(1)">TradingView</button>
       <button class="tab-button" onclick="switchTab(2)">Calendar</button>
       <button class="tab-button" onclick="switchTab(3)">EPS</button>
@@ -440,428 +311,269 @@
       <button class="tab-button" onclick="switchTab(5)">CEORater</button>
       <button class="tab-button" onclick="switchTab(6)">FinModel</button>
       <button class="tab-button" onclick="switchTab(7)">OpenAI</button>
-    </div>
+    </nav>
+  </header>
+
+  <main class="app-main">
 
     <div class="tab-content home active">
-      <div class="home-grid">
-        <section class="home-card home-tv">
-          <div class="home-head">
-            <h2>Markets</h2>
-            <button class="chip" onclick="switchTab(1)">Open full</button>
-          </div>
-          <div class="home-tv-body">
-            <div id="tv-home-widget" style="width:100%;height:100%;"></div>
-          </div>
-        </section>
-
-        <section class="home-card home-pulse">
-          <div class="home-head">
-            <h2>T2D Pulse</h2>
-            <button class="chip" onclick="window.open('https://pulse.tek2dayholdings.com', '_blank')">Open full</button>
-          </div>
-          <div class="home-frame">
-            <iframe id="pulse-iframe" data-src="https://pulse.tek2dayholdings.com" title="T2D Pulse" loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"></iframe>
-          </div>
-        </section>
-
-        <section class="home-card home-ceorater">
-          <div class="home-head">
-            <h2>CEORater</h2>
-            <button class="chip" onclick="switchTab(5)">Open full</button>
-          </div>
-          <div class="home-frame">
-            <div class="scale-wrap">
-              <iframe id="ceo-home-iframe" data-src="https://ceorater.com" title="CEORater" loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="home-container">
+        <div class="home-grid">
+          
+          <section class="home-card home-tv">
+            <div class="home-head">
+              <h2>Markets</h2>
+              <button class="chip" onclick="switchTab(1)">Open full</button>
             </div>
-          </div>
-        </section>
+            <div class="home-frame" style="background:transparent;">
+              <div id="tv-home-widget" style="width:100%;height:100%;"></div>
+            </div>
+          </section>
 
-        <section class="home-card home-finmodel">
-          <div class="home-head">
-            <h2>FinModel</h2>
-            <button class="chip" onclick="switchTab(6)">Open full</button>
-          </div>
-          <div class="home-frame">
-            <iframe data-src="https://finmodel.app/" title="FinModel" loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"></iframe>
-          </div>
-        </section>
+          <section class="home-card home-pulse">
+            <div class="home-head">
+              <h2>T2D Pulse</h2>
+              <button class="chip" onclick="window.open('https://pulse.tek2dayholdings.com', '_blank')">Open full</button>
+            </div>
+            <div class="home-frame">
+              <iframe id="pulse-iframe" data-src="https://pulse.tek2dayholdings.com" title="T2D Pulse" loading="lazy"></iframe>
+            </div>
+          </section>
 
-        <section class="home-card home-econ-calendar">
-          <div class="home-head">
-            <h2>Economic Calendar</h2>
-            <button class="chip" onclick="switchTab(2)">Open full</button>
-          </div>
-          <div class="home-frame">
-            <div class="tradingview-widget-container" style="width:100%;height:100%;">
-              <div class="tradingview-widget-container__widget"></div>
-              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js"
-                async>
-                  {
-                    "colorTheme": "dark",
-                    "isTransparent": false,
-                    "locale": "en",
-                    "countryFilter": "ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu",
-                    "importanceFilter": "-1,0,1",
-                    "width": "100%",
-                    "height": "100%"
-                  }
+          <section class="home-card home-ceorater">
+            <div class="home-head">
+              <h2>CEORater</h2>
+              <button class="chip" onclick="switchTab(5)">Open full</button>
+            </div>
+            <div class="home-frame">
+              <div class="scale-wrap">
+                <iframe id="ceo-home-iframe" data-src="https://ceorater.com" title="CEORater" loading="lazy"></iframe>
+              </div>
+            </div>
+          </section>
+
+          <section class="home-card home-finmodel">
+            <div class="home-head">
+              <h2>FinModel</h2>
+              <button class="chip" onclick="switchTab(6)">Open full</button>
+            </div>
+            <div class="home-frame">
+              <iframe data-src="https://finmodel.app/" title="FinModel" loading="lazy"></iframe>
+            </div>
+          </section>
+
+          <section class="home-card home-econ-calendar">
+            <div class="home-head">
+              <h2>Economic Calendar</h2>
+              <button class="chip" onclick="switchTab(2)">Open full</button>
+            </div>
+            <div class="home-frame">
+              <div class="tradingview-widget-container" style="width:100%;height:100%;">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+                  { "colorTheme": "dark", "isTransparent": false, "locale": "en", "width": "100%", "height": "100%" }
                 </script>
+              </div>
             </div>
-          </div>
-        </section>
-        <section class="home-card home-tek-calendar">
-          <div class="home-head">
-            <h2>Earnings Calendar</h2>
-            <button class="chip" onclick="switchTab(3)">
-              Open full
-            </button>
-          </div>
-          <div class="home-frame">
-            <iframe
-              data-src="https://calendar.tek2dayholdings.com/"
-              title="Earnings Calendar"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-          </div>
-        </section>
+          </section>
+
+          <section class="home-card home-tek-calendar">
+            <div class="home-head">
+              <h2>Earnings Calendar</h2>
+              <button class="chip" onclick="switchTab(3)">Open full</button>
+            </div>
+            <div class="home-frame">
+              <iframe data-src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar" loading="lazy"></iframe>
+            </div>
+          </section>
+
+        </div>
       </div>
     </div>
 
     <div class="tab-content tradingview">
-      <div class="tradingview-container">
-        <div id="tradingview-widget" style="width:100%;height:100%;"></div>
-      </div>
+      <div id="tradingview-widget" style="width:100%;height:100%;"></div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
         <div class="tradingview-widget-container" style="width:100%;height:100%;">
           <div class="tradingview-widget-container__widget"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js"
-            async>
-              {
-                "colorTheme": "dark",
-                "isTransparent": false,
-                "locale": "en",
-                "countryFilter": "ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu",
-                "importanceFilter": "-1,0,1",
-                "width": "100%",
-                "height": "100%"
-              }
-            </script>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+            { "colorTheme": "dark", "isTransparent": false, "locale": "en", "width": "100%", "height": "100%" }
+          </script>
         </div>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar" loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
-    </div>
-
-    <div class="tab-content pulse-full-tab">
-      <div class="iframe-container">
-        <iframe src="https://pulse.tek2dayholdings.com" title="T2D Pulse"></iframe>
-        <div class="pulse-overlay" onclick="window.open('https://pulse.tek2dayholdings.com', '_blank')"></div>
+        <iframe src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
-      <div class="iframe-container edge-to-edge">
+      <div class="iframe-container">
+        <iframe src="https://pulse.tek2dayholdings.com" title="T2D Pulse"></iframe>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <div class="iframe-container">
         <iframe src="https://ceorater.com" title="CEORater"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://finmodel.app/" title="FinModel" loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://finmodel.app/" title="FinModel"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://openai.com" title="OpenAI" allow="fullscreen; clipboard-read; clipboard-write"
-          referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <iframe src="https://openai.com" title="OpenAI"></iframe>
       </div>
     </div>
 
-    <div id="installBanner" aria-label="Install TEK2day Dashboard">
-      <span>Install TEK2day Dashboard</span>
-      <button id="installBtn">Install TEK2day Dashboard</button>
-      <small id="installStatus" style="margin-left:8px;"></small>
-    </div>
-    <div id="iosTip">On iOS: tap <strong>Share</strong> → <strong>Add to Home Screen</strong>.</div>
+  </main>
 
-    <div id="updateToast" style="
-      position:fixed;left:50%;transform:translateX(-50%);
-      bottom:16px;background:#111827;color:#f9fafb;border:1px solid #374151;
-      padding:10px 14px;border-radius:10px;display:none;z-index:9999">
-      A new version is available.
-      <button id="refreshBtn" style="
-        margin-left:10px;padding:6px 10px;border-radius:8px;
-        border:none;background:#22c55e;color:#052e16;font-weight:700;cursor:pointer">
-        Refresh
-      </button>
-    </div>
+  <div id="installBanner">
+    <span>Install App</span>
+    <button id="installBtn">Install</button>
+  </div>
+  
+  <div id="updateToast" style="position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#111827;color:#fff;padding:12px;border-radius:8px;border:1px solid #374151;display:none;z-index:9999">
+    Update available. <button id="refreshBtn" style="margin-left:8px;background:#22c55e;border:none;border-radius:4px;padding:4px 8px;font-weight:bold;cursor:pointer;">Refresh</button>
+  </div>
 
-    <script id="tvjs" src="https://s3.tradingview.com/tv.js" defer></script>
+  <script id="tvjs" src="https://s3.tradingview.com/tv.js" defer></script>
+  <script>
+    /* --- TRADINGVIEW INIT --- */
+    const TVReady = new Promise((resolve) => {
+      function check() { if (window.TradingView) resolve(); else setTimeout(check, 100); }
+      check();
+    });
 
-    <script>
-      // TradingView readiness
-      const TVReady = new Promise((resolve) => {
-        function onReady() { if (window.TradingView && window.TradingView.widget) resolve(); }
-        if (window.TradingView && window.TradingView.widget) resolve();
-        else {
-          const s = document.getElementById('tvjs');
-          if (s) s.addEventListener('load', onReady, { once: true });
-          const check = setInterval(() => {
-            if (window.TradingView && window.TradingView.widget) { clearInterval(check); resolve(); }
-          }, 50);
-        }
+    let tvHomeInit = false;
+    let tvFullInit = false;
+
+    async function initTV(id) {
+      await TVReady;
+      new TradingView.widget({
+        autosize: true,
+        container_id: id,
+        symbol: 'NASDAQ:AAPL',
+        interval: 'D',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        theme: 'dark',
+        style: 1,
+        locale: 'en',
+        toolbar_bg: '#f1f3f6',
+        enable_publishing: false,
+        hide_side_toolbar: false,
+        allow_symbol_change: true,
+        details: true,
+        studies: ['MAExp@tv-basicstudies', 'RSI@tv-basicstudies']
       });
+    }
 
-      // FULL chart in the Home card
-      let tvHomeInitialized = false;
-      async function initTradingViewHome() {
-        if (tvHomeInitialized) return;
-        const el = document.getElementById('tv-home-widget');
-        if (!el) return;
-        await TVReady;
-        tvHomeInitialized = true;
-        new TradingView.widget({
-          autosize: true,
-          container_id: 'tv-home-widget',
-          symbol: 'NASDAQ:AAPL',
-          interval: 'D',
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          theme: 'dark',
-          style: 1,
-          locale: 'en',
-          hide_top_toolbar: false,
-          hide_side_toolbar: false,
-          allow_symbol_change: true,
-          details: true,
-          studies: ['MAExp@tv-basicstudies', 'RSI@tv-basicstudies', 'MACD@tv-basicstudies']
-        });
-      }
+    /* --- TABS & NAVIGATION --- */
+    function switchTab(index) {
+      const tabs = document.querySelectorAll('.tab-content');
+      const buttons = document.querySelectorAll('.tab-button');
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      buttons.forEach(b => b.classList.remove('active'));
+      
+      if(tabs[index]) tabs[index].classList.add('active');
+      if(buttons[index]) buttons[index].classList.add('active');
 
-      // FULL chart in the dedicated TradingView tab
-      let tvFullInitialized = false;
-      async function initTradingView() {
-        if (tvFullInitialized) return;
-        const el = document.getElementById('tradingview-widget');
-        if (!el) return;
-        await TVReady;
-        tvFullInitialized = true;
-        new TradingView.widget({
-          autosize: true,
-          container_id: 'tradingview-widget',
-          symbol: 'NASDAQ:AAPL',
-          interval: 'D',
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          theme: 'dark',
-          style: 1,
-          locale: 'en',
-          hide_top_toolbar: false,
-          hide_side_toolbar: false,
-          allow_symbol_change: true,
-          details: true,
-          studies: ['MAExp@tv-basicstudies', 'RSI@tv-basicstudies', 'MACD@tv-basicstudies']
-        });
-      }
+      // Lazy Load Logic
+      if (index === 0 && !tvHomeInit) { initTV('tv-home-widget'); tvHomeInit = true; loadHomeFrames(); }
+      if (index === 1 && !tvFullInit) { initTV('tradingview-widget'); tvFullInit = true; }
+      
+      // Home preview scaler
+      if (index === 0) requestAnimationFrame(scaleCeoraterPreview);
+    }
 
-      function switchTab(index) {
-        const tabs = document.querySelectorAll('.tab-content');
-        const buttons = document.querySelectorAll('.tab-button');
-        tabs.forEach(t => t.classList.remove('active'));
-        buttons.forEach(b => b.classList.remove('active'));
-        tabs[index].classList.add('active');
-        buttons[index].classList.add('active');
-
-        // Initialize charts on demand
-        if (index === 0) initTradingViewHome();
-        if (tabs[index].classList.contains('tradingview')) initTradingView();
-
-        // Lazy-load Home iframes when Home is shown
-        if (index === 0) {
-          document.querySelectorAll('.home-frame iframe[data-src], .home-tv-body iframe[data-src]').forEach(f => {
-            if (!f.src) f.src = f.dataset.src;
-          });
-        }
-
-        // Re-scale CEORater preview when returning to Home
-        if (index === 0) requestAnimationFrame(scaleCeoraterPreview);
-      }
-
-      window.addEventListener('DOMContentLoaded', () => {
-        // Initialize Home chart immediately
-        initTradingViewHome();
-
-        // If TradingView full tab is active on load, initialize it
-        if (document.querySelector('.tab-content.tradingview.active')) initTradingView();
-
-        // Lazy-load Home iframes as they appear
-        (function lazyHomeFrames() {
-          const iframes = document.querySelectorAll('.home-frame iframe[data-src], .home-tv-body iframe[data-src]');
-          if (!('IntersectionObserver' in window) || iframes.length === 0) {
-            iframes.forEach(f => { if (!f.src) f.src = f.dataset.src; });
-            return;
-          }
-          const io = new IntersectionObserver(entries => {
-            entries.forEach(e => {
-              if (e.isIntersecting) {
-                const f = e.target;
-                if (!f.src) f.src = f.dataset.src;
-                io.unobserve(f);
-              }
-            });
-          }, { rootMargin: '200px 0px' });
-          iframes.forEach(f => io.observe(f));
-        })();
-
-        // Once CEORater iframe loads, scale it (mobile only)
-        const ceoIframe = document.getElementById('ceo-home-iframe');
-        if (ceoIframe) {
-          ceoIframe.addEventListener('load', () => {
-            requestAnimationFrame(scaleCeoraterPreview);
-          });
-        }
+    function loadHomeFrames() {
+      document.querySelectorAll('.home-frame iframe[data-src]').forEach(f => {
+        if (!f.src) f.src = f.dataset.src;
       });
+    }
 
-      // Debounce helper
-      function debounce(fn, delay = 120) {
-        let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
-      }
+    /* --- MASTER-LEVEL SCALER FOR HOME PREVIEW --- */
+    function scaleCeoraterPreview() {
+      const wrap = document.querySelector('.scale-wrap');
+      const iframe = document.getElementById('ceo-home-iframe');
+      if (!wrap || !iframe) return;
+      
+      // 1. CLEAR ALL PREVIOUS TRANSFORMS
+      iframe.style.width = '';
+      iframe.style.height = '';
+      iframe.style.transform = '';
+      iframe.style.transformOrigin = '';
+      iframe.style.position = '';
+      iframe.style.left = '';
+      iframe.style.top = '';
+      iframe.style.zoom = '';
 
-      // Scale CEORater preview on mobile so its 4 cards align like desktop
-      function scaleCeoraterPreview() {
-        const wrap = document.querySelector('.home-ceorater .scale-wrap');
-        const iframe = document.getElementById('ceo-home-iframe');
-        if (!wrap || !iframe) return;
+      const isDesktop = window.matchMedia('(min-width:1024px)').matches;
 
-        const isDesktop = window.matchMedia('(min-width:1024px)').matches;
-        if (isDesktop) {
-          // Reset to normal on desktop
-          iframe.style.transform = '';
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
-          return;
-        }
-
-        // On mobile: use CSS zoom instead of transform scale for better rendering
-        const available = wrap.clientWidth;
-        const desktopWidth = 1024;
-        const scale = Math.max(0.4, Math.min(1, available / desktopWidth));
-
-        // Use zoom property for crisper rendering on mobile
-        iframe.style.zoom = scale;
-        iframe.style.transformOrigin = 'top left';
+      if (isDesktop) {
         iframe.style.width = '100%';
         iframe.style.height = '100%';
+        return;
       }
 
-      // Re-scale on resize/orientation changes (mobile)
-      window.addEventListener('resize', debounce(() => {
-        requestAnimationFrame(scaleCeoraterPreview);
-      }, 120));
+      // 2. DETERMINISTIC MOBILE SCALING
+      const virtualWidth = 1280; 
+      const availableWidth = wrap.clientWidth;
+      const availableHeight = wrap.clientHeight;
+      
+      const scale = availableWidth / virtualWidth;
+      
+      iframe.style.width = `${virtualWidth}px`;
+      iframe.style.height = `${availableHeight / scale}px`; 
+      
+      iframe.style.transform = `scale(${scale})`;
+      iframe.style.transformOrigin = '0 0';
+      iframe.style.position = 'absolute';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+    }
 
-      // PWA install banner
-      let deferredPrompt = null;
-      const banner = document.getElementById('installBanner');
-      const installBtn = document.getElementById('installBtn');
-      const status = document.getElementById('installStatus');
+    /* --- INITIALIZATION --- */
+    window.addEventListener('DOMContentLoaded', () => {
+      initTV('tv-home-widget');
+      tvHomeInit = true;
+      loadHomeFrames();
+      
+      scaleCeoraterPreview();
 
+      // PWA Logic
+      let deferredPrompt;
+      const installBanner = document.getElementById('installBanner');
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        banner.style.display = 'block';
+        installBanner.style.display = 'block';
       });
-
-      installBtn?.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        status.textContent = outcome === 'accepted' ? 'Installing…' : 'Dismissed';
-        deferredPrompt = null;
-        banner.style.display = 'none';
-      });
-
-      window.addEventListener('appinstalled', () => {
-        status.textContent = 'Installed!';
-        banner.style.display = 'none';
-      });
-
-      // Service worker registration with "update available" toast
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', async () => {
-          try {
-            const reg = await navigator.serviceWorker.register('/service-worker.js');
-
-            const showUpdateToast = () => {
-              const toast = document.getElementById('updateToast');
-              if (!toast) return;
-              toast.style.display = 'block';
-              const btn = document.getElementById('refreshBtn');
-              if (btn) btn.onclick = () => reg.waiting?.postMessage('SKIP_WAITING');
-            };
-
-            // If a worker is already waiting (return visits), prompt immediately
-            if (reg.waiting) showUpdateToast();
-
-            // When a new worker is found, wait for it to finish installing
-            reg.addEventListener('updatefound', () => {
-              const sw = reg.installing;
-              sw?.addEventListener('statechange', () => {
-                if (sw.state === 'installed' && navigator.serviceWorker.controller) {
-                  showUpdateToast();
-                }
-              });
-            });
-
-            // When the new worker activates (after SKIP_WAITING), reload to swap versions
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-              if (refreshing) return;
-              refreshing = true;
-              window.location.reload();
-            });
-          } catch (e) {
-            console.error('SW registration failed', e);
-          }
-        });
-      }
-
-      // Listen for messages from T2D Pulse iframe (article clicks)
-      window.addEventListener('message', (event) => {
-        // Verify the message is from pulse.tek2dayholdings.com
-        if (event.origin === 'https://pulse.tek2dayholdings.com') {
-          if (event.data.type === 'article-click' && event.data.url) {
-            // Open the article URL in current tab
-            window.location.href = event.data.url;
-          }
+      document.getElementById('installBtn').addEventListener('click', async () => {
+        if(deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt = null;
+          installBanner.style.display = 'none';
         }
       });
+    });
 
-      // Listen for article clicks from T2D Pulse iframe
-      window.addEventListener('message', (event) => {
-        // Security: Only accept messages from pulse.tek2dayholdings.com
-        if (event.origin !== 'https://pulse.tek2dayholdings.com') return;
-
-        // Check if this is an article click message
-        if (event.data && event.data.type === 'article-click' && event.data.url) {
-          // Navigate the entire page to the article URL
-          window.location.href = event.data.url;
-        }
-      });
-
-    </script>
-  </div>
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+       clearTimeout(resizeTimer);
+       resizeTimer = setTimeout(scaleCeoraterPreview, 50);
+    });
+  </script>
 </body>
-
 </html>
