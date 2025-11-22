@@ -1,5 +1,6 @@
-/* Service worker: precache + network-first navigations + polite update flow */
-const CACHE = 't2d-dashboard-v4'; // ⬅️ bump this on each deploy
+/* Service worker: precache + network-first navigations + INSTANT update flow */
+// 1. BUMP THIS VERSION to force the browser to dump the old cache
+const CACHE = 't2d-dashboard-v5'; 
 
 const PRECACHE_URLS = [
   '/',
@@ -15,7 +16,8 @@ const PRECACHE_URLS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE_URLS)));
-  // Removed self.skipWaiting() so the new SW waits politely until user confirms
+  // 2. UNCOMMENTED: Force this new worker to activate immediately
+  self.skipWaiting(); 
 });
 
 self.addEventListener('activate', (event) => {
@@ -24,10 +26,10 @@ self.addEventListener('activate', (event) => {
       Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
     )
   );
+  // 3. Claim control of the page immediately
   self.clients.claim();
 });
 
-// Listen for page request to activate immediately (used by the toast button)
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -36,12 +38,14 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
-  // 1) Navigations: network-first, then shell, then offline page
+  // Navigations: network-first, then shell, then offline page
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
+        // Try the network first (Get the NEW index.html)
         return await fetch(request);
       } catch {
+        // If offline, fallback to cache
         const cache = await caches.open(CACHE);
         return (await cache.match('/'))
             || (await cache.match('/index.html'))
@@ -51,7 +55,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2) Same-origin assets: cache-first with background fill
+  // Same-origin assets: cache-first with background fill
   const url = new URL(request.url);
   if (url.origin === location.origin) {
     event.respondWith((async () => {
@@ -64,6 +68,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3) Cross-origin: fetch (customize caching if desired)
+  // Cross-origin: fetch
   event.respondWith(fetch(request));
 });
