@@ -531,13 +531,14 @@
 
       const isDesktop = window.matchMedia('(min-width:1024px)').matches;
 
+      // FIX: If it's a desktop, stop scaling and let CEORater's own responsive code take over.
       if (isDesktop) {
         iframe.style.width = '100%';
         iframe.style.height = '100%';
         return;
       }
 
-      // 2. DETERMINISTIC MOBILE SCALING
+      // 2. DETERMINISTIC MOBILE SCALING (Only runs on mobile/small screens)
       const virtualWidth = 1280; 
       const availableWidth = wrap.clientWidth;
       const availableHeight = wrap.clientHeight;
