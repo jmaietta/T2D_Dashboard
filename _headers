@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * 'self' blob: https://api.polygon.io https://px.ads.linkedin.com; frame-src *;
