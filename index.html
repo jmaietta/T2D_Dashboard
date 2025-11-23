@@ -501,13 +501,13 @@
       });
     }
 
-    /* --- MASTER-LEVEL SCALER FOR HOME PREVIEW --- */
+    /* --- SIMPLIFIED SCALER FOR HOME PREVIEW --- */
     function scaleCeoraterPreview() {
       const wrap = document.querySelector('.scale-wrap');
       const iframe = document.getElementById('ceo-home-iframe');
       if (!wrap || !iframe) return;
       
-      // 1. CLEAR ALL PREVIOUS TRANSFORMS
+      // Clear all transforms
       iframe.style.width = '';
       iframe.style.height = '';
       iframe.style.transform = '';
@@ -517,29 +517,9 @@
       iframe.style.top = '';
       iframe.style.zoom = '';
 
-      const isDesktop = window.matchMedia('(min-width:1024px)').matches;
-
-      if (isDesktop) {
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        return;
-      }
-
-      // 2. DETERMINISTIC MOBILE SCALING
-      const virtualWidth = 1280; 
-      const availableWidth = wrap.clientWidth;
-      const availableHeight = wrap.clientHeight;
-      
-      const scale = availableWidth / virtualWidth;
-      
-      iframe.style.width = `${virtualWidth}px`;
-      iframe.style.height = `${availableHeight / scale}px`; 
-      
-      iframe.style.transform = `scale(${scale})`;
-      iframe.style.transformOrigin = '0 0';
-      iframe.style.position = 'absolute';
-      iframe.style.top = '0';
-      iframe.style.left = '0';
+      // Let iframe render naturally at its actual width (mobile or desktop)
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
     }
 
     /* --- INITIALIZATION --- */
