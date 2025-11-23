@@ -406,31 +406,31 @@
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar"></iframe>
+        <iframe data-src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://pulse.tek2dayholdings.com" title="T2D Pulse"></iframe>
+        <iframe data-src="https://pulse.tek2dayholdings.com" title="T2D Pulse" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://ceorater.com" title="CEORater"></iframe>
+        <iframe data-src="https://ceorater.com" title="CEORater" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://finmodel.app/" title="FinModel"></iframe>
+        <iframe data-src="https://finmodel.app/" title="FinModel" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://openai.com" title="OpenAI"></iframe>
+        <iframe data-src="https://openai.com" title="OpenAI" loading="lazy"></iframe>
       </div>
     </div>
 
@@ -490,6 +490,14 @@
       // Lazy Load Logic
       if (index === 0 && !tvHomeInit) { initTV('tv-home-widget'); tvHomeInit = true; loadHomeFrames(); }
       if (index === 1 && !tvFullInit) { initTV('tradingview-widget'); tvFullInit = true; }
+      
+      // Load tab iframe if not already loaded
+      if (tabs[index]) {
+        const iframe = tabs[index].querySelector('iframe[data-src]');
+        if (iframe && !iframe.src) {
+          iframe.src = iframe.dataset.src;
+        }
+      }
       
       // Home preview scaler
       if (index === 0) requestAnimationFrame(scaleCeoraterPreview);
