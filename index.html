@@ -406,31 +406,31 @@
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar"></iframe>
+        <iframe data-src="https://calendar.tek2dayholdings.com/" title="Earnings Calendar" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://pulse.tek2dayholdings.com" title="T2D Pulse"></iframe>
+        <iframe data-src="https://pulse.tek2dayholdings.com" title="T2D Pulse" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://ceorater.com" title="CEORater"></iframe>
+        <iframe data-src="https://ceorater.com" title="CEORater" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://finmodel.app/" title="FinModel"></iframe>
+        <iframe data-src="https://finmodel.app/" title="FinModel" loading="lazy"></iframe>
       </div>
     </div>
 
     <div class="tab-content">
       <div class="iframe-container">
-        <iframe src="https://openai.com" title="OpenAI"></iframe>
+        <iframe data-src="https://openai.com" title="OpenAI" loading="lazy"></iframe>
       </div>
     </div>
 
@@ -491,6 +491,14 @@
       if (index === 0 && !tvHomeInit) { initTV('tv-home-widget'); tvHomeInit = true; loadHomeFrames(); }
       if (index === 1 && !tvFullInit) { initTV('tradingview-widget'); tvFullInit = true; }
       
+      // Load tab iframe if not already loaded
+      if (tabs[index]) {
+        const iframe = tabs[index].querySelector('iframe[data-src]');
+        if (iframe && !iframe.src) {
+          iframe.src = iframe.dataset.src;
+        }
+      }
+      
       // Home preview scaler
       if (index === 0) requestAnimationFrame(scaleCeoraterPreview);
     }
@@ -501,13 +509,13 @@
       });
     }
 
-    /* --- SIMPLIFIED SCALER FOR HOME PREVIEW --- */
+    /* --- MASTER-LEVEL SCALER FOR HOME PREVIEW --- */
     function scaleCeoraterPreview() {
       const wrap = document.querySelector('.scale-wrap');
       const iframe = document.getElementById('ceo-home-iframe');
       if (!wrap || !iframe) return;
       
-      // Clear all transforms
+      // 1. CLEAR ALL PREVIOUS TRANSFORMS
       iframe.style.width = '';
       iframe.style.height = '';
       iframe.style.transform = '';
@@ -517,9 +525,29 @@
       iframe.style.top = '';
       iframe.style.zoom = '';
 
-      // Let iframe render naturally at its actual width (mobile or desktop)
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
+      const isDesktop = window.matchMedia('(min-width:1024px)').matches;
+
+      if (isDesktop) {
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        return;
+      }
+
+      // 2. DETERMINISTIC MOBILE SCALING
+      const virtualWidth = 1280; 
+      const availableWidth = wrap.clientWidth;
+      const availableHeight = wrap.clientHeight;
+      
+      const scale = availableWidth / virtualWidth;
+      
+      iframe.style.width = `${virtualWidth}px`;
+      iframe.style.height = `${availableHeight / scale}px`; 
+      
+      iframe.style.transform = `scale(${scale})`;
+      iframe.style.transformOrigin = '0 0';
+      iframe.style.position = 'absolute';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
     }
 
     /* --- INITIALIZATION --- */
