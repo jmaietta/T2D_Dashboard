@@ -1,6 +1,6 @@
 # T2D Dashboard
 
-**Fintech dashboard that includes TradingView (markets), T2D Pulse (news), CEORater & OpenAI.**
+**Fintech dashboard that includes TradingView (markets), T2D Pulse (news), CEORater & Kilby.**
 
 🎥 Demo: https://youtu.be/gGTeoDeLkVM?si=GTiBhbQHDPSjuxZF
 
@@ -8,7 +8,7 @@
 
 ## What it is
 - **Home**: Full TradingView chart (center), **T2D Pulse** feed (right), **CEORater** below the chart.
-- **Tabs**: TradingView • T2D Pulse • CEORater • OpenAI
+- **Tabs**: TradingView • T2D Pulse • CEORater • Kilby
 - **PWA**: Installable, offline fallback, and an update prompt when a new version is available.
 
 **Live site**: https://dash.tek2dayholdings.com/
